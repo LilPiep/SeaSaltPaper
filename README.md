@@ -1,3 +1,19 @@
+# Sea Salt & Paper in Lua w/ Love
+
+Do you know the game Sea Salt & Paper ? I do. So I decided to make a clone of it in Lua with the Love2D framework.
+
+## DISCLAIMER
+
+I don't make any profit on this project. I made it for educational purposes only. All rights go to the original game Sea Salt & Paper.
+
+## Sources and documentation
+
+I used this very nice tutorial as a code base for this project: https://berbasoft.com/simplegametutorials/love/blackjack/
+
+The template MarkDown file is below
+
+-----------------------------------------------------------------------
+
 # LOVE VSCode Game Template
 A fully configured VSCode template for LOVE
 
