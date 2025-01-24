@@ -52,36 +52,26 @@ end
 function love.keypressed(key)
     if playerTurn and not playerActionCompleted then
 		if choosingDiscardPile then
-            -- Playe chooses the discard he wants to place the card back on
+            -- Player chooses the discard he wants to place the card back on
             if key == '1' then
                 table.insert(discardOne, table.remove(drawnCards, 1))
-                playerActionCompleted = true
+                choosingDiscardPile = false
+				playerActionCompleted = true
             elseif key == '2' then
                 table.insert(discardTwo, table.remove(drawnCards, 1))
-                playerActionCompleted = true
+                choosingDiscardPile = false
+				playerActionCompleted = true
             end
         elseif playerDrawingCards then
             -- Player chooses which drawn card to keep
             if key == '1' then
-                -- Keep the first card
                 table.insert(handPlayerOne, table.remove(drawnCards, 1))
-                -- Place the remaining card in the appropriate discard pile
-                if #discardOne == 0 then
-                    table.insert(discardOne, table.remove(drawnCards, 1))
-                else
-                    table.insert(discardTwo, table.remove(drawnCards, 1))
-                end
-                playerActionCompleted = true
+                choosingDiscardPile = true
+                playerDrawingCards = false
             elseif key == '2' then
-                -- Keep the second card
                 table.insert(handPlayerOne, table.remove(drawnCards, 2))
-                -- Place the remaining card in the appropriate discard pile
-                if #discardOne == 0 then
-                    table.insert(discardOne, table.remove(drawnCards, 1))
-                else
-                    table.insert(discardTwo, table.remove(drawnCards, 1))
-                end
-                playerActionCompleted = true
+                choosingDiscardPile = true
+                playerDrawingCards = false
             end
         else
             -- Player decides their action
@@ -106,8 +96,6 @@ function love.keypressed(key)
         -- End the player's turn
         playerTurn = false
         playerActionCompleted = false
-		choosingDiscardPile = false
-		playerDrawingCards = false
 
         -- Opponent's turn (simplified logic)
         takeCard(handPlayerTwo)
