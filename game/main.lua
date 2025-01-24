@@ -1,4 +1,7 @@
 function love.load()
+	-- Set random seed based on current time for true randomness
+    math.randomseed(os.time())
+
     -- Definition of card types and their quantities in the deck
     local cardDefinitions = {
         -- Duo cards
@@ -36,6 +39,21 @@ function love.load()
         print('Card #'..i..': '..card.type)
     end
     print('Total number of cards in deck: '..#deck)
+
+	discardOne = {}
+	discardTwo = {}
+    table.insert(discardOne, table.remove(deck, 1))
+    table.insert(discardTwo, table.remove(deck, 1))
+
+    -- Temporary
+    print('Discard n°1:')
+    for cardIndex, card in ipairs(discardOne) do
+        print('type: '..card.type)
+    end
+	print('Discard n°2:')
+	for cardIndex, card in ipairs(discardTwo) do
+        print('type: '..card.type)
+    end
 end
 
 function shuffleDeck(deck)
