@@ -23,10 +23,6 @@ function love.load()
     end
     print('Total number of cards in deck: ' .. #deck)
 
-	function takeCard(target)
-        table.insert(target, table.remove(deck, 1))
-    end
-
 	discardOne = {}
 	discardTwo = {}
     takeCard(discardOne)
@@ -38,6 +34,8 @@ function love.load()
 	playerTurn = true
     playerActionCompleted = false
 	playerDrawingCards = false
+	choosingDiscardPile = false
+	drawnCards = {}
 end
 
 function shuffleDeck(deck)
@@ -47,34 +45,75 @@ function shuffleDeck(deck)
     end
 end
 
+function takeCard(target)
+	table.insert(target, table.remove(deck, 1))
+end
+
 function love.keypressed(key)
     if playerTurn and not playerActionCompleted then
-        if key == 'q' and #discardOne > 0 then
-            -- Take the first discard pile card
-            table.insert(handPlayerOne, table.remove(discardOne, #discardOne))
-            playerActionCompleted = true
-        elseif key == 'd' and #discardTwo > 0 then
-            -- Take the second discard pile card
-            table.insert(handPlayerOne, table.remove(discardTwo, #discardTwo))
-            playerActionCompleted = true
-        elseif key == 'z' then
-            -- Draw two cards from the deck
-            takeCard(handPlayerOne)
-            takeCard(handPlayerOne)
-            playerActionCompleted = true
+		if choosingDiscardPile then
+            -- Playe chooses the discard he wants to place the card back on
+            if key == '1' then
+                table.insert(discardOne, table.remove(drawnCards, 1))
+                playerActionCompleted = true
+            elseif key == '2' then
+                table.insert(discardTwo, table.remove(drawnCards, 1))
+                playerActionCompleted = true
+            end
+        elseif playerDrawingCards then
+            -- Player chooses which drawn card to keep
+            if key == '1' then
+                -- Keep the first card
+                table.insert(handPlayerOne, table.remove(drawnCards, 1))
+                -- Place the remaining card in the appropriate discard pile
+                if #discardOne == 0 then
+                    table.insert(discardOne, table.remove(drawnCards, 1))
+                else
+                    table.insert(discardTwo, table.remove(drawnCards, 1))
+                end
+                playerActionCompleted = true
+            elseif key == '2' then
+                -- Keep the second card
+                table.insert(handPlayerOne, table.remove(drawnCards, 2))
+                -- Place the remaining card in the appropriate discard pile
+                if #discardOne == 0 then
+                    table.insert(discardOne, table.remove(drawnCards, 1))
+                else
+                    table.insert(discardTwo, table.remove(drawnCards, 1))
+                end
+                playerActionCompleted = true
+            end
+        else
+            -- Player decides their action
+            if key == 'q' and #discardOne > 0 then
+                -- Take the top card from discard pile 1
+                table.insert(handPlayerOne, table.remove(discardOne, #discardOne))
+                playerActionCompleted = true
+            elseif key == 'd' and #discardTwo > 0 then
+                -- Take the top card from discard pile 2
+                table.insert(handPlayerOne, table.remove(discardTwo, #discardTwo))
+                playerActionCompleted = true
+            elseif key == 'z' then
+                -- Draw two cards from the deck
+                takeCard(drawnCards)
+                takeCard(drawnCards)
+                playerDrawingCards = true
+            end
         end
     end
 
     if playerActionCompleted then
-        -- Pass the turn to the next phase
+        -- End the player's turn
         playerTurn = false
         playerActionCompleted = false
+		choosingDiscardPile = false
+		playerDrawingCards = false
 
-        -- For simplicity, the opponent doesn't make decisions yet
+        -- Opponent's turn (simplified logic)
         takeCard(handPlayerTwo)
         takeCard(handPlayerTwo)
 
-        -- Back to Player One's turn
+        -- Return to Player One's turn
         playerTurn = true
     end
 end
@@ -112,10 +151,21 @@ function love.draw()
 
 	-- Indicate whose turn it is
     if playerTurn then
-        table.insert(output, '\nIt\'s your turn!')
-        table.insert(output, 'Press q to take the top card from Discard n°1.')
-        table.insert(output, 'Press d to take the top card from Discard n°2.')
-        table.insert(output, 'Press z to draw two cards from the deck.')
+        if choosingDiscardPile then
+            table.insert(output, '\nChoose a discard pile for the remaining card:')
+            table.insert(output, 'Press 1 to place it on Discard n°1.')
+            table.insert(output, 'Press 2 to place it on Discard n°2.')
+        elseif playerDrawingCards then
+            table.insert(output, '\nYou drew two cards:')
+            table.insert(output, '1: ' .. drawnCards[1].type .. ' (' .. drawnCards[1].color .. ')')
+            table.insert(output, '2: ' .. drawnCards[2].type .. ' (' .. drawnCards[2].color .. ')')
+            table.insert(output, 'Press 1 to keep the first card, or 2 to keep the second.')
+        else
+            table.insert(output, '\nIt\'s your turn!')
+            table.insert(output, 'Press q to take the top card from Discard n°1.')
+            table.insert(output, 'Press d to take the top card from Discard n°2.')
+            table.insert(output, 'Press z to draw two cards from the deck.')
+        end
     else
         table.insert(output, '\nOpponent is playing...')
     end
