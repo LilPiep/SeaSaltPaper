@@ -73,6 +73,7 @@ end
 
 function playDuoCards(hand, mat, typeToPlay)
     local cardsPlayed = 0
+	local isFishDuo = (typeToPlay == "fish")
     for i = #hand, 1, -1 do
         if hand[i].nature == "duo" and hand[i].type == typeToPlay then
             table.insert(mat, table.remove(hand, i))
@@ -82,6 +83,7 @@ function playDuoCards(hand, mat, typeToPlay)
             end
         end
     end
+	return isFishDuo
 end
 
 function love.keypressed(key)
@@ -147,7 +149,12 @@ function love.keypressed(key)
 					playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					print("You played a duo of type: " .. cardType)
 					canPlayDuo = false
-					playerActionCompleted = true
+					if isFishDuo then
+						print("You played a fish duo! Take a bonus card.")
+						takeCard(handPlayerOne)
+					else
+						playerActionCompleted = true
+					end
 					break
 				end
 			end
@@ -161,17 +168,17 @@ function love.keypressed(key)
 
     if playerActionCompleted then
         -- End the player's turn
-        playerTurn = false
-        playerActionCompleted = false
+		playerTurn = false
+		playerActionCompleted = false
 
-        -- Opponent's turn (simplified logic : it always take 2 cards, chooses the left one and put the second back on the left discard)
-        takeCard(drawnCards)
-        takeCard(drawnCards)
+		-- Opponent's turn (simplified logic : it always take 2 cards, chooses the left one and put the second back on the left discard)
+		takeCard(drawnCards)
+		takeCard(drawnCards)
 		table.insert(handPlayerTwo, table.remove(drawnCards, 1))
 		table.insert(discardOne, table.remove(drawnCards, 1))
 
-        -- Return to Player One's turn
-        playerTurn = true
+		-- Return to Player One's turn
+		playerTurn = true
     end
 end
 
