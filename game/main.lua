@@ -29,12 +29,15 @@ function love.load()
 	takeCard(discardTwo)
 
 	handPlayerOne = {}
+	matPlayerOne = {}
 	handPlayerTwo = {}
 
 	playerTurn = true
     playerActionCompleted = false
 	playerDrawingCards = false
 	choosingDiscardPile = false
+	canPlayDuo = false
+	playerPlayingDuo = false
 	drawnCards = {}
 end
 
@@ -47,6 +50,38 @@ end
 
 function takeCard(target)
 	table.insert(target, table.remove(deck, 1))
+end
+
+function checkDuoPlayable(hand)
+    local duoCards = {}
+    for _, card in ipairs(hand) do
+        if card.nature == "duo" then
+            if not duoCards[card.type] then
+                duoCards[card.type] = 0
+            end
+            duoCards[card.type] = duoCards[card.type] + 1
+        end
+    end
+
+    for _, count in pairs(duoCards) do
+        if count >= 2 then
+            return true
+        end
+    end
+    return false
+end
+
+function playDuoCards(hand, mat, typeToPlay)
+    local cardsPlayed = 0
+    for i = #hand, 1, -1 do
+        if hand[i].nature == "duo" and hand[i].type == typeToPlay then
+            table.insert(mat, table.remove(hand, i))
+            cardsPlayed = cardsPlayed + 1
+            if cardsPlayed == 2 then
+                break
+            end
+        end
+    end
 end
 
 function love.keypressed(key)
@@ -92,6 +127,38 @@ function love.keypressed(key)
         end
     end
 
+	-- Phase 2 of a turn : Playing duo cards (not mendatory)
+	if playerTurn and canPlayDuo then
+		-- Permet au joueur de poser des cartes "duo"
+		if key == 'p' then
+			-- Trouve le type pour lequel poser les cartes
+			local duoCards = {}
+			for _, card in ipairs(handPlayerOne) do
+				if card.nature == "duo" then
+					if not duoCards[card.type] then
+						duoCards[card.type] = 0
+					end
+					duoCards[card.type] = duoCards[card.type] + 1
+				end
+			end
+	
+			for cardType, count in pairs(duoCards) do
+				if count >= 2 then
+					playDuoCards(handPlayerOne, matPlayerOne, cardType)
+					print("You played a duo of type: " .. cardType)
+					canPlayDuo = false
+					playerActionCompleted = true
+					break
+				end
+			end
+		end
+	end
+
+	-- Phase 3 of a turn : End the round 
+	--[[
+	TODO
+	]]
+
     if playerActionCompleted then
         -- End the player's turn
         playerTurn = false
@@ -115,6 +182,7 @@ function getTotal(hand)
 end
 
 function love.update()
+	canPlayDuo = checkDuoPlayable(handPlayerOne)
 end
 
 function love.draw()
@@ -139,6 +207,17 @@ function love.draw()
     end
 	table.insert(output, 'Total: '..getTotal(handPlayerOne))
 
+	-- Display the player's mat
+	table.insert(output, 'Your mat:')
+	for _, card in ipairs(matPlayerOne) do
+		table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
+	end
+
+	-- Says if the player can play a duo
+	if canPlayDuo then
+		table.insert(output, '\nYou can play a duo! Press "p" to play two "duo" cards of the same type.')
+	end
+
 	-- Opponent hand
     table.insert(output, 'Your opp hand:')
     for _, card in ipairs(handPlayerTwo) do
@@ -157,7 +236,7 @@ function love.draw()
             table.insert(output, '1: ' .. drawnCards[1].type .. ' (' .. drawnCards[1].color .. ')')
             table.insert(output, '2: ' .. drawnCards[2].type .. ' (' .. drawnCards[2].color .. ')')
             table.insert(output, 'Press 1 to keep the first card, or 2 to keep the second.')
-        else
+		else
             table.insert(output, '\nIt\'s your turn!')
             table.insert(output, 'Press q to take the top card from Discard n°1.')
             table.insert(output, 'Press d to take the top card from Discard n°2.')
