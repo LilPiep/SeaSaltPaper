@@ -97,9 +97,11 @@ function love.keypressed(key)
         playerTurn = false
         playerActionCompleted = false
 
-        -- Opponent's turn (simplified logic)
-        takeCard(handPlayerTwo)
-        takeCard(handPlayerTwo)
+        -- Opponent's turn (simplified logic : it always take 2 cards, chooses the left one and put the second back on the left discard)
+        takeCard(drawnCards)
+        takeCard(drawnCards)
+		table.insert(handPlayerTwo, table.remove(drawnCards, 1))
+		table.insert(discardOne, table.remove(drawnCards, 1))
 
         -- Return to Player One's turn
         playerTurn = true
@@ -136,6 +138,13 @@ function love.draw()
         table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
     end
 	table.insert(output, 'Total: '..getTotal(handPlayerOne))
+
+	-- Opponent hand
+    table.insert(output, 'Your opp hand:')
+    for _, card in ipairs(handPlayerTwo) do
+        table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
+    end
+	table.insert(output, 'Total: '..getTotal(handPlayerTwo))
 
 	-- Indicate whose turn it is
     if playerTurn then
