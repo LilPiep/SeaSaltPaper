@@ -81,6 +81,7 @@ function playDuoCards(hand, mat, typeToPlay)
     local cardsPlayed = 0
 	local isCrabDuo = (typeToPlay == "crab")
 	local isFishDuo = (typeToPlay == "fish")
+	local isBoatDuo = (typeToPlay == "boat")
     for i = #hand, 1, -1 do
         if hand[i].nature == "duo" and hand[i].type == typeToPlay then
             table.insert(mat, table.remove(hand, i))
@@ -90,7 +91,7 @@ function playDuoCards(hand, mat, typeToPlay)
             end
         end
     end
-	return isFishDuo
+	return isCrabDuo, isBoatDuo, isFishDuo
 end
 
 function love.keypressed(key)
@@ -153,14 +154,19 @@ function love.keypressed(key)
 	
 			for cardType, count in pairs(duoCards) do
 				if count >= 2 then
-					local isFishDuo = playDuoCards(handPlayerOne, matPlayerOne, cardType)
+					local isCrabDuo, isBoatDuo, isFishDuo = playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					print("You played a duo of type: " .. cardType)
 					
-					if isFishDuo then
+					if isCrabDuo then
+						print("You played a crab duo! Select a discard and choose a card in it")
+						-- TODO : fonction to select a card from a discard
+					elseif isBoatDuo then
+						print("You played a boat duo! play again !")
+						-- TODO : boat logic
+					elseif isFishDuo then
 						print("You played a fish duo! Take a bonus card.")
 						takeCard(handPlayerOne)
-						isFishDuo = false
 					end
 					
 					canPlayDuo = false
