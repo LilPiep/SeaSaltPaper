@@ -153,15 +153,18 @@ function love.keypressed(key)
 	
 			for cardType, count in pairs(duoCards) do
 				if count >= 2 then
+					local isFishDuo = playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					print("You played a duo of type: " .. cardType)
-					canPlayDuo = false
+					
 					if isFishDuo then
 						print("You played a fish duo! Take a bonus card.")
 						takeCard(handPlayerOne)
-					else
-						playerActionCompleted = true
+						isFishDuo = false
 					end
+					
+					canPlayDuo = false
+					playerActionCompleted = true
 					break
 				end
 			end
