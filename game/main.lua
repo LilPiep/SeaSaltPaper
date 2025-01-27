@@ -77,6 +77,7 @@ end
 
 function playDuoCards(hand, mat, typeToPlay)
     local cardsPlayed = 0
+	local isCrabDuo = (typeToPlay == "crab")
 	local isFishDuo = (typeToPlay == "fish")
     for i = #hand, 1, -1 do
         if hand[i].nature == "duo" and hand[i].type == typeToPlay then
@@ -200,16 +201,22 @@ function love.draw()
     local output = {}
 
     -- Display discard pile 1
-    table.insert(output, 'Discard n°1:')
-    for _, card in ipairs(discardOne) do
-        table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
-    end
+	table.insert(output, 'Discard n°1:')
+    if #discardOne > 0 then
+		local topCard = discardOne[#discardOne]
+		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
+	else
+		table.insert(output, 'No cards in this discard')
+	end
 
     -- Display discard pile 2
     table.insert(output, 'Discard n°2:')
-    for _, card in ipairs(discardTwo) do
-        table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
-    end
+    if #discardTwo > 0 then
+		local topCard = discardTwo[#discardTwo]
+		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
+	else
+		table.insert(output, 'No cards in this discard')
+	end
 
 	-- Players hand
     table.insert(output, 'Your hand:')
@@ -222,11 +229,6 @@ function love.draw()
 	table.insert(output, 'Your mat:')
 	for _, card in ipairs(matPlayerOne) do
 		table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
-	end
-
-	-- Says if the player can play a duo
-	if canPlayDuo then
-		table.insert(output, '\nYou can play a duo! Press "p" to play two "duo" cards of the same type.')
 	end
 
 	-- Opponent hand
@@ -256,6 +258,11 @@ function love.draw()
     else
         table.insert(output, '\nOpponent is playing...')
     end
+
+	-- Says if the player can play a duo
+	if canPlayDuo then
+		table.insert(output, '\nYou can play a duo! Press "p" to play two "duo" cards of the same type.')
+	end
 
     -- Draw the output text on the screen
     love.graphics.print(table.concat(output, '\n'), 15, 15)
