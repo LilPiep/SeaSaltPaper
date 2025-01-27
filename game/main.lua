@@ -30,7 +30,9 @@ function love.load()
 
 	handPlayerOne = {}
 	matPlayerOne = {}
+
 	handPlayerTwo = {}
+	matPlayerTwo = {}
 
 	playerTurn = true
     playerActionCompleted = false
@@ -210,7 +212,7 @@ function love.draw()
 	end
 
     -- Display discard pile 2
-    table.insert(output, 'Discard n°2:')
+    table.insert(output, '\nDiscard n°2:')
     if #discardTwo > 0 then
 		local topCard = discardTwo[#discardTwo]
 		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
@@ -219,7 +221,7 @@ function love.draw()
 	end
 
 	-- Players hand
-    table.insert(output, 'Your hand:')
+    table.insert(output, '\nYour hand:')
     for _, card in ipairs(handPlayerOne) do
         table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
     end
@@ -232,11 +234,17 @@ function love.draw()
 	end
 
 	-- Opponent hand
-    table.insert(output, 'Your opp hand:')
+    table.insert(output, '\nYour opp hand:')
     for _, card in ipairs(handPlayerTwo) do
         table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
     end
 	table.insert(output, 'Total: '..getTotal(handPlayerTwo))
+
+	-- Display the opponent's mat
+	table.insert(output, 'Your opp mat:')
+	for _, card in ipairs(matPlayerTwo) do
+		table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
+	end
 
 	-- Indicate whose turn it is
     if playerTurn then
