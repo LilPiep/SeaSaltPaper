@@ -52,6 +52,10 @@ function takeCard(target)
 	table.insert(target, table.remove(deck, 1))
 end
 
+function playFromHand(target, hand)
+	table.insert(target, table.remove(hand, 1))
+end
+
 function checkDuoPlayable(hand)
     local duoCards = {}
     for _, card in ipairs(hand) do
