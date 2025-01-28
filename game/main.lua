@@ -1,11 +1,33 @@
+-- Definition of card types and their quantities in the deck
+local cardDefinitions = require("cards")
+
+-- Import the functions related to the deck 
+local functions = require("deckFunctions")
+
+-- global variables (temp)
+deck = {}
+discardOne = {}
+discardTwo = {}
+handPlayerOne = {}
+matPlayerOne = {}
+handPlayerTwo = {}
+matPlayerTwo = {}
+playerTurn = true
+playerActionCompleted = false
+playerDrawingCards = false
+choosingDiscardPile = false
+canPlayDuo = false
+deckEmpty = false
+playerPlayingDuo = false
+drawnCards = {}
+choosingFromDiscard = false
+selectedDiscardPile = nil
+discardSelectionIndex = 1
+
+
 function love.load()
 	-- Set random seed based on current time for true randomness
     math.randomseed(os.time())
-
-    -- Definition of card types and their quantities in the deck
-    local cardDefinitions = require("cards")
-
-    deck = {}
 
     -- Initialize the deck
     for _, cardDef in ipairs(cardDefinitions) do
@@ -15,7 +37,7 @@ function love.load()
     end
 
     -- Shuffle the deck
-    shuffleDeck(deck)
+    functions.shuffleDeck(deck)
 
     -- Debug: Print deck content to verify
     for i, card in ipairs(deck) do
@@ -23,81 +45,9 @@ function love.load()
     end
     print('Total number of cards in deck: ' .. #deck)
 
-	discardOne = {}
-	discardTwo = {}
-    takeCard(discardOne)
-	takeCard(discardTwo)
-
-	handPlayerOne = {}
-	matPlayerOne = {}
-
-	handPlayerTwo = {}
-	matPlayerTwo = {}
-
-	playerTurn = true
-    playerActionCompleted = false
-	playerDrawingCards = false
-	choosingDiscardPile = false
-	canPlayDuo = false
-    deckEmpty = false
-	playerPlayingDuo = false
-	drawnCards = {}
-end
-
-function shuffleDeck(deck)
-    for i = #deck, 2, -1 do
-        local j = math.random(i)
-        deck[i], deck[j] = deck[j], deck[i]
-    end
-end
-
-function takeCard(target)
-	if #deck > 0 then
-        table.insert(target, table.remove(deck, 1))
-        if #deck == 0 then
-            deckEmpty = true
-        end
-    end
-end
-
-function playFromHand(target, hand)
-	table.insert(target, table.remove(hand, 1))
-end
-
-function checkDuoPlayable(hand)
-    local duoCards = {}
-    for _, card in ipairs(hand) do
-        if card.nature == "duo" then
-            if not duoCards[card.type] then
-                duoCards[card.type] = 0
-            end
-            duoCards[card.type] = duoCards[card.type] + 1
-        end
-    end
-
-    for _, count in pairs(duoCards) do
-        if count >= 2 then
-            return true
-        end
-    end
-    return false
-end
-
-function playDuoCards(hand, mat, typeToPlay)
-    local cardsPlayed = 0
-	local isCrabDuo = (typeToPlay == "crab")
-	local isFishDuo = (typeToPlay == "fish")
-	local isBoatDuo = (typeToPlay == "boat")
-    for i = #hand, 1, -1 do
-        if hand[i].nature == "duo" and hand[i].type == typeToPlay then
-            table.insert(mat, table.remove(hand, i))
-            cardsPlayed = cardsPlayed + 1
-            if cardsPlayed == 2 then
-                break
-            end
-        end
-    end
-	return isCrabDuo, isBoatDuo, isFishDuo
+	-- Init the discards
+    functions.takeCard(discardOne)
+	functions.takeCard(discardTwo)
 end
 
 function love.keypressed(key)
@@ -136,8 +86,8 @@ function love.keypressed(key)
                 playerActionCompleted = true
             elseif key == 'z' then
                 -- Draw two cards from the deck
-                takeCard(drawnCards)
-                takeCard(drawnCards)
+                functions.takeCard(drawnCards)
+                functions.takeCard(drawnCards)
                 playerDrawingCards = true
             end
         end
@@ -160,19 +110,18 @@ function love.keypressed(key)
 	
 			for cardType, count in pairs(duoCards) do
 				if count >= 2 then
-					local isCrabDuo, isBoatDuo, isFishDuo = playDuoCards(handPlayerOne, matPlayerOne, cardType)
-					playDuoCards(handPlayerOne, matPlayerOne, cardType)
+					local isCrabDuo, isBoatDuo, isFishDuo = functions.playDuoCards(handPlayerOne, matPlayerOne, cardType)
+					functions.playDuoCards(handPlayerOne, matPlayerOne, cardType)
 					print("You played a duo of type: " .. cardType)
 					
 					if isCrabDuo then
 						print("You played a crab duo! Select a discard and choose a card in it")
-						-- TODO : fonction to select a card from a discard
 					elseif isBoatDuo then
 						print("You played a boat duo! play again !")
 						-- TODO : boat logic
 					elseif isFishDuo then
 						print("You played a fish duo! Take a bonus card.")
-						takeCard(handPlayerOne)
+						functions.takeCard(handPlayerOne)
 					end
 					
 					canPlayDuo = false
@@ -194,8 +143,8 @@ function love.keypressed(key)
 		playerActionCompleted = false
 
 		-- Opponent's turn (simplified logic : it always take 2 cards, chooses the left one and put the second back on the left discard)
-		takeCard(drawnCards)
-		takeCard(drawnCards)
+		functions.takeCard(drawnCards)
+		functions.takeCard(drawnCards)
 		table.insert(handPlayerTwo, table.remove(drawnCards, 1))
 		table.insert(discardOne, table.remove(drawnCards, 1))
 
@@ -204,22 +153,12 @@ function love.keypressed(key)
     end
 end
 
-function getTotal(hand)
-	local total = 0
-    --[[
-	-- Points related to duos
-    -- Points related to collections
-    -- Points related to colors
-    ]]
-	return total
-end
-
 function love.update()
     if deckEmpty then
         -- Stop the game and display a message
         return
     end
-	canPlayDuo = checkDuoPlayable(handPlayerOne)
+	canPlayDuo = functions.checkDuoPlayable(handPlayerOne)
 end
 
 function love.draw()
@@ -254,7 +193,7 @@ function love.draw()
     for _, card in ipairs(handPlayerOne) do
         table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
     end
-	table.insert(output, 'Total: '..getTotal(handPlayerOne))
+	table.insert(output, 'Total: '..functions.getTotal(handPlayerOne))
 
 	-- Display the player's mat
 	table.insert(output, 'Your mat:')
@@ -267,7 +206,7 @@ function love.draw()
     for _, card in ipairs(handPlayerTwo) do
         table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
     end
-	table.insert(output, 'Total: '..getTotal(handPlayerTwo))
+	table.insert(output, 'Total: '..functions.getTotal(handPlayerTwo))
 
 	-- Display the opponent's mat
 	table.insert(output, 'Your opp mat:')
