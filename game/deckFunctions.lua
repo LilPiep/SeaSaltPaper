@@ -18,8 +18,9 @@ function functions.takeCard(target)
     end
 end
 
-function functions.playFromHand(target, hand)
-	table.insert(target, table.remove(hand, 1))
+-- Takes a card from a table and add it to a target 
+function functions.takeCardFrom(target, from)
+	table.insert(target, table.remove(from, 1))
 end
 
 function functions.checkDuoPlayable(hand)
