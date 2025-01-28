@@ -39,6 +39,7 @@ function love.load()
 	playerDrawingCards = false
 	choosingDiscardPile = false
 	canPlayDuo = false
+    deckEmpty = false
 	playerPlayingDuo = false
 	drawnCards = {}
 end
@@ -51,7 +52,12 @@ function shuffleDeck(deck)
 end
 
 function takeCard(target)
-	table.insert(target, table.remove(deck, 1))
+	if #deck > 0 then
+        table.insert(target, table.remove(deck, 1))
+        if #deck == 0 then
+            deckEmpty = true
+        end
+    end
 end
 
 function playFromHand(target, hand)
@@ -200,15 +206,29 @@ end
 
 function getTotal(hand)
 	local total = 0
-	-- TODO : Implement the logic to calculate the total value of the hand
+    --[[
+	-- Points related to duos
+    -- Points related to collections
+    -- Points related to colors
+    ]]
 	return total
 end
 
 function love.update()
+    if deckEmpty then
+        -- Stop the game and display a message
+        return
+    end
 	canPlayDuo = checkDuoPlayable(handPlayerOne)
 end
 
 function love.draw()
+    
+    if deckEmpty then
+        love.graphics.print("Game over! The deck is empty. Nobody wins.", 15, 15)
+        return
+    end
+
     local output = {}
 
     -- Display discard pile 1
