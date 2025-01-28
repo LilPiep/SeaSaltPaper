@@ -59,6 +59,17 @@ function functions.playDuoCards(hand, mat, typeToPlay)
 	return isCrabDuo, isBoatDuo, isFishDuo
 end
 
+function functions.displayDiscard(discard, selectedIndex)
+    print("Discard pile:")
+    for i, card in ipairs(discard) do
+        if i == selectedIndex then
+            print("> [" .. i .. "] " .. card.name .. " <-- Selected")
+        else
+            print("  [" .. i .. "] " .. card.name)
+        end
+    end
+end
+
 function functions.getTotal(hand)
 	local total = 0
     --[[

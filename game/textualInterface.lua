@@ -1,31 +1,32 @@
 -- Import the functions related to the deck 
 local functions = require("deckFunctions")
 
+-- Display a discard
+local function displayDiscard(discard, output)
+	if #discard > 0 then
+		local topCard = discard[#discard]
+		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
+	else
+		table.insert(output, 'No cards in this discard')
+	end
+end
+
 function textualInterface()
 	if deckEmpty then
 		love.graphics.print("Game over! The deck is empty. Nobody wins.", 15, 15)
 		return
 	end
 	
+	love.window.setTitle("Sea Salt Paper")
 	local output = {}
 	
 	-- Display discard pile 1
 	table.insert(output, 'Discard n°1:')
-	if #discardOne > 0 then
-		local topCard = discardOne[#discardOne]
-		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
-	else
-		table.insert(output, 'No cards in this discard')
-	end
+	displayDiscard(discardOne, output)
 	
 	-- Display discard pile 2
 	table.insert(output, '\nDiscard n°2:')
-	if #discardTwo > 0 then
-		local topCard = discardTwo[#discardTwo]
-		table.insert(output, ' - type: ' .. topCard.type .. ', color: ' .. topCard.color .. ', nature: ' .. topCard.nature)
-	else
-		table.insert(output, 'No cards in this discard')
-	end
+	displayDiscard(discardTwo, output)
 	
 	-- Players hand
 	table.insert(output, '\nYour hand:')

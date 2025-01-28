@@ -27,8 +27,8 @@ deckEmpty = false
 playerPlayingDuo = false
 drawnCards = {}
 choosingFromDiscard = false
-selectedDiscardPile = nil
-discardSelectionIndex = 1
+selectedDiscard = nil
+selectedCardIndex = 1
 
 
 function love.load()
