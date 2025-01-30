@@ -19,8 +19,13 @@ function functions.takeCard(target)
 end
 
 -- Takes a card from a table and add it to a target 
-function functions.takeCardFrom(target, from)
-	table.insert(target, table.remove(from, 1))
+function functions.takeCardFrom(destination, source)
+	if #source > 0 then 
+        local card = table.remove(source, 1)
+        table.insert(destination, card)
+    else
+        print("Error: Source pile is empty!")
+    end
 end
 
 function functions.checkDuoPlayable(hand)

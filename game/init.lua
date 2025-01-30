@@ -3,7 +3,7 @@ local cardDefinitions = require("cards")
 -- Import the functions related to the deck 
 local functions = require("deckFunctions")
 
-function init()
+function Init()
 	-- Set random seed based on current time for true randomness
     math.randomseed(os.time())
 
@@ -28,4 +28,4 @@ function init()
 	functions.takeCard(discardTwo)
 end
 
-return init
+return Init

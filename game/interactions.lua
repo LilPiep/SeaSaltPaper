@@ -49,7 +49,6 @@ function interactions(key)
 		elseif playerDrawingCards then
 			-- Player chooses which drawn card to keep
 			if key == '1' then
-				functions.takeCardFrom(handPlayerOne, drawnCards)
 				table.insert(handPlayerOne, table.remove(drawnCards, 1))
 				choosingDiscardPile = true
 				playerDrawingCards = false
