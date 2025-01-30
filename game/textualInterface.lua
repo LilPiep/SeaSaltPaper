@@ -54,18 +54,20 @@ function textualInterface()
 	for _, card in ipairs(matPlayerTwo) do
 		table.insert(output, ' - type: ' .. card.type .. ', color: ' .. card.color .. ', nature: ' .. card.nature)
 	end
-
-	-- In case the player played a Crab Duo
-	if choosingCrabCard and selectedDiscard then
-		love.graphics.print("Choose a card:", 100, 100)
-		for i, card in ipairs(selectedDiscard) do
-			love.graphics.print(i .. ". " .. card.type .. " (" .. card.color .. ")", 100, 120 + (i * 20))
-		end
-	end
 	
 	-- Indicate whose turn it is
 	if playerTurn then
-		if choosingDiscardPile then
+		-- In case the player played a Crab Duo
+		if choosingCrabCard then
+			table.insert(output, '\nPress 1 to browse Discard n°1')
+			table.insert(output, 'Press 2 to browse Discard n°2')
+			if selectedDiscard then
+				love.graphics.print("Choose a card:", 100, 100)
+				for i, card in ipairs(selectedDiscard) do
+					love.graphics.print(i .. ". " .. card.type .. " (" .. card.color .. ")", 100, 120 + (i * 20))
+				end
+			end
+		elseif choosingDiscardPile then
 			table.insert(output, '\nChoose a discard pile for the remaining card:')
 			table.insert(output, 'Press 1 to place it on Discard n°1.')
 			table.insert(output, 'Press 2 to place it on Discard n°2.')
