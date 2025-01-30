@@ -26,9 +26,10 @@ canPlayDuo = false
 deckEmpty = false
 playerPlayingDuo = false
 drawnCards = {}
-choosingFromDiscard = false
-selectedDiscard = nil
 selectedCardIndex = 1
+choosingCrabDiscard = false
+choosingCrabCard = false
+selectedDiscard = nil
 
 
 function love.load()

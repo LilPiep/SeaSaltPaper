@@ -3,36 +3,28 @@ local functions = require("deckFunctions")
 
 function interactions(key)
 
-	if choosingFromDiscard then
-        if not selectedDiscard then
-            if key == '1' and #discardOne > 0 then
-                selectedDiscard = discardOne
-                selectedCardIndex = 1
-                print("You are now browsing discard pile 1.")
-            elseif key == '2' and #discardTwo > 0 then
-                selectedDiscard = discardTwo
-                selectedCardIndex = 1
-                print("You are now browsing discard pile 2.")
-            else
-                print("Invalid choice or discard is empty.")
-            end
-        else
-            if key == 'w' then
-                selectedCardIndex = math.max(1, selectedCardIndex - 1)
-            elseif key == 's' then
-                selectedCardIndex = math.min(#selectedDiscard, selectedCardIndex + 1)
-            elseif key == 'enter' then
-                local selectedCard = table.remove(selectedDiscard, selectedCardIndex)
-                table.insert(handPlayerOne, selectedCard)
-                print("You picked a card from the discard pile: " .. selectedCard.name)
-                choosingFromDiscard = false
-                selectedDiscard = nil
-                selectedCardIndex = 1
-                playerActionCompleted = true
-            end
-            functions.displayDiscard(selectedDiscard, selectedCardIndex)
-        end
-    end
+	if choosingCrabDiscard then
+		if key == '1' and #discardOne > 0 then
+			selectedDiscard = discardOne
+			choosingCrabDiscard = false
+			choosingCrabCard = true
+		elseif key == '2' and #discardTwo > 0 then
+			selectedDiscard = discardTwo
+			choosingCrabDiscard = false
+			choosingCrabCard = true
+		end
+	end
+
+	if choosingCrabCard then
+		local index = tonumber(key)
+		if index and index > 0 and index <= #selectedDiscard then
+			local chosenCard = selectedDiscard[index]
+			table.insert(handPlayerOne, chosenCard)
+			table.remove(selectedDiscard, index)
+			choosingCrabCard = false
+			selectedDiscard = nil
+		end
+	end
 
 	if playerTurn and not playerActionCompleted then
 		if choosingDiscardPile then
@@ -99,8 +91,7 @@ function interactions(key)
 					
 					if isCrabDuo then
 						print("You played a crab duo! Select a discard and choose a card in it")
-						choosingFromDiscard = true
-						selectedDiscard = nil
+						choosingCrabDiscard = true
 					elseif isBoatDuo then
 						print("You played a boat duo! play again !")
 						-- TODO : boat logic
@@ -125,6 +116,10 @@ function interactions(key)
 	
 	if playerActionCompleted then
 		-- End the player's turn
+		choosingCrabDiscard = false
+		choosingCrabCard = false
+		selectedDiscard = nil
+		selectedCardIndex = 1
 		playerTurn = false
 		playerActionCompleted = false
 	
